@@ -606,6 +606,18 @@ def test_stratified_strategy_sparse_target(global_random_seed, csc_container):
 
 
 @pytest.mark.parametrize("csc_container", CSC_CONTAINERS)
+@pytest.mark.parametrize("strategy", ["most_frequent", "prior"])
+def test_most_frequent_and_prior_sparse_nonconsecutive_labels(csc_container, strategy):
+    X = [[0]] * 5  # ignored
+    y = csc_container(np.array([[0], [1], [4], [4], [4]]))
+    clf = DummyClassifier(strategy=strategy, random_state=0)
+    clf.fit(X, y)
+    y_pred = clf.predict(X)
+    assert sp.issparse(y_pred)
+    assert_array_equal(y_pred.toarray(), np.full((5, 1), 4))
+
+
+@pytest.mark.parametrize("csc_container", CSC_CONTAINERS)
 def test_most_frequent_and_prior_strategy_sparse_target(csc_container):
     X = [[0]] * 5  # ignored
     y = csc_container(np.array([[1, 0], [1, 3], [4, 0], [0, 1], [1, 0]]))
